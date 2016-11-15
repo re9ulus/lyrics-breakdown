@@ -29,6 +29,7 @@ class LyricsFreakScrapper(SongScrapper):
 			try:
 				link = item.find('a').get('href')
 				name = item.find('a').get('title')
+				name = name.replace('Lyrics', '').strip()
 				song_urls[name] = self.main_url + link
 			except Exception, e:
 				print('Can\'t parse song link: {}'.format(e))
@@ -51,7 +52,14 @@ if __name__ == '__main__':
 	scrapper = LyricsFreakScrapper()
 	songs = scrapper.get_list_of_songs('beatles')
 
-	for name, url in songs.items()[:2]:
-		print(name, url)
-		print(scrapper.parse_song(url))
+	for name, url in songs.items():
+		print(name)
+		song_lyrics = scrapper.parse_song(url)
+		if not song_lyrics:
+			continue
+		try:
+			with open('../data/beatles/{}.txt'.format(name), 'w+') as f:
+				f.write(song_lyrics)
+		except Exception, e:
+			print('Can not write {0} lyrics to file: {1}'.format(name, e))
 		print('\n==\n')
